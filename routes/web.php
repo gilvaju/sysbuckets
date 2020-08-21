@@ -20,4 +20,6 @@ Route::get('/', function () {
 Auth::routes();
 Route::get('/dashboard', 'HomeController@index')->name('dashboard');
 Route::resource('bucket', 'BucketController');
-Route::resource('file', 'FileController');
+
+Route::get('file/{bucket}', ['as' => 'file.index', 'uses' => 'FileController@index']);
+Route::resource('file', 'FileController', ['except' => ['index']]);

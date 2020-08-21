@@ -69,8 +69,7 @@ class BucketController extends Controller
      */
     public function edit(Bucket $bucket)
     {
-        return view('buckets-edit')
-            ->with('bucket', $bucket);
+        return view('buckets-edit')->with('bucket', $bucket);
     }
 
     /**
