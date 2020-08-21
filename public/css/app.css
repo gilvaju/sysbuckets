@@ -10904,3 +10904,8 @@ a.text-dark:focus {
   }
 }
 
+.no-decoration {
+  text-decoration: none;
+  color: black;
+}
+
