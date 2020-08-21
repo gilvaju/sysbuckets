@@ -85,8 +85,7 @@
                 </div>
 
                 <div class="links">
-                    <a href="{{ url('/bucket') }}">Buckets</a>
-                    <a href="{{ url('/file') }}">Arquivos</a>
+                    <a href="{{ url('/bucket') }}">Gerenciar</a>
                 </div>
             </div>
         </div>
