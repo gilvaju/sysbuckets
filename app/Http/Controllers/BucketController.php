@@ -10,11 +10,13 @@ class BucketController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param Bucket $bucket
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Bucket $bucket)
     {
-        return view('buckets');
+        $buckets = $bucket->all();
+        return view('buckets')->with('buckets', $buckets);
     }
 
     /**
@@ -62,34 +64,48 @@ class BucketController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param Bucket $bucket
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Bucket $bucket)
     {
-        //
+        return view('buckets-edit')
+            ->with('bucket', $bucket);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param Bucket $bucket
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Bucket $bucket)
     {
-        //
+        request()->validate([
+            'name' => ['required'],
+            'region' => ['required'],
+            'key' => ['required'],
+            'secret' => ['required'],
+            'expirationTime' => ['required']
+        ]);
+
+        $bucket->fill($request->all())->save();
+        return redirect('/bucket');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param Request $request
+     * @param Bucket $bucket
      * @return \Illuminate\Http\Response
+     * @throws \Exception
      */
-    public function destroy($id)
+    public function destroy(Request $request, Bucket $bucket)
     {
-        //
+        $bucket->delete();
+        $request->session()->flash('status', 'Bucket excluído!');
+        return redirect('/bucket');
     }
 }
