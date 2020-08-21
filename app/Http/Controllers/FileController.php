@@ -72,7 +72,7 @@ class FileController extends Controller
 
         $this->setBucket(Bucket::find($request->bucket));
 
-        if ($request->file('file')->storeAs('/', $request->file('file')->getClientOriginalName())) {
+        if ($request->file('file')->storeAs('/', $request->file('file')->getClientOriginalName(), 's3')) {
             $request->session()->flash('status', 'Upload com sucesso');
         }
         return redirect(route('file.index', $request->bucket));
