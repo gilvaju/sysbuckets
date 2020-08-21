@@ -3,17 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Bucket;
-use App\File;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
+
     /**
      * @var mixed
      */
-    private $bucketExpirationtime;
+    private $bucketExpirationTime;
+
+    /**
+     * Block with middleware default for auth.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
 
     /**
      * Display a listing of the resource.
@@ -88,9 +98,6 @@ class FileController extends Controller
     public function edit($id)
     {
         //
-//        $this->setBucket(Bucket::find($bucket));
-//        $fileUrl = Storage::disk('s3')->temporaryUrl($id, Carbon::now()->addMinutes($this->bucketExpirationtime));;
-//        return view('file-show')->with('fileUrl', $fileUrl);
     }
 
     /**
@@ -127,7 +134,7 @@ class FileController extends Controller
      */
     private function setBucket(Bucket $bucket): void
     {
-        $this->bucketExpirationtime = $bucket->expirationTime;
+        $this->bucketExpirationTime = $bucket->expirationTime;
         $bucketConfig = [
             'driver' => 's3',
             'key' => $bucket->key,
@@ -144,6 +151,6 @@ class FileController extends Controller
      */
     private function getTemporaryUrl($file)
     {
-        return Storage::disk('s3')->temporaryUrl($file, Carbon::now()->addMinutes($this->bucketExpirationtime));
+        return Storage::disk('s3')->temporaryUrl($file, Carbon::now()->addMinutes($this->bucketExpirationTime));
     }
 }

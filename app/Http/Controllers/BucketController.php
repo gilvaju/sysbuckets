@@ -8,6 +8,16 @@ use Illuminate\Http\Request;
 class BucketController extends Controller
 {
     /**
+     * Block with middleware default for auth.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @param Bucket $bucket
@@ -37,13 +47,7 @@ class BucketController extends Controller
      */
     public function store(Request $request, Bucket $bucket)
     {
-        request()->validate([
-            'name' => ['required'],
-            'region' => ['required'],
-            'key' => ['required'],
-            'secret' => ['required'],
-            'expirationTime' => ['required']
-        ]);
+        $this->validateData();
 
         $bucket->create($request->all());
         $request->session()->flash('status', 'Bucket salvo!');
@@ -81,13 +85,7 @@ class BucketController extends Controller
      */
     public function update(Request $request, Bucket $bucket)
     {
-        request()->validate([
-            'name' => ['required'],
-            'region' => ['required'],
-            'key' => ['required'],
-            'secret' => ['required'],
-            'expirationTime' => ['required']
-        ]);
+        $this->validateData();
 
         $bucket->fill($request->all())->save();
         return redirect('/bucket');
@@ -106,5 +104,16 @@ class BucketController extends Controller
         $bucket->delete();
         $request->session()->flash('status', 'Bucket excluído!');
         return redirect('/bucket');
+    }
+
+    private function validateData(): void
+    {
+        request()->validate([
+            'name' => ['required'],
+            'region' => ['required'],
+            'key' => ['required'],
+            'secret' => ['required'],
+            'expirationTime' => ['required']
+        ]);
     }
 }
