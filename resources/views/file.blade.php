@@ -35,10 +35,9 @@
         </div>
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">{{ __('Lista de buckets') }}</div>
+                <div class="card-header">S3 Selecionado: <b>{{ $bucketName }}</b></div>
 
                 <div class="card-body">
-
                     <ul class="list-group">
                         @foreach($files as $file)
                             <li class="list-group-item">
@@ -54,6 +53,9 @@
                             </li>
                         @endforeach
                     </ul>
+                    <div class="row mt-3 ml-1">
+                        <a href="{{ route('bucket.index') }}" class="btn btn-dark" role="button">Voltar para lista de Buckets</a>
+                    </div>
                 </div>
             </div>
         </div>

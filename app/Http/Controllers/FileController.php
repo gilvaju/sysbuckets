@@ -44,7 +44,10 @@ class FileController extends Controller
             ];
         }
 
-        return view('file')->with('files', $files)->with('bucket', $bucket->id);
+        return view('file')
+            ->with('files', $files)
+            ->with('bucket', $bucket->id)
+            ->with('bucketName', $bucket->name);
     }
 
     /**
