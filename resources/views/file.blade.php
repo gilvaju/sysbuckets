@@ -1,4 +1,4 @@
-@extends('layouts.app')$bucket->find($id)
+@extends('layouts.app')
 
 @section('content')
 <div class="container">
@@ -17,37 +17,23 @@
     <div class="row justify-content-center">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-header">{{ __('Cadastro de buckets') }}</div>
+                <div class="card-header">{{ __('Upload de arquivos') }}</div>
 
                 <div class="card-body">
 
-                    <form action="{{ route('bucket.store') }}" method="POST">
+                    <form action="{{ route('file.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="form-group">
-                            <label for="name">Nome</label>
-                            <input type="text" class="form-control" name="name" id="name">
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">Arquivo:</span>
+                            </div>
+                            <div class="custom-file">
+                                <input type="file" name="file" class="custom-file-input" id="files">
+                                <label class="custom-file-label" for="files">Procurar</label>
+                            </div>
                         </div>
-
-                        <div class="form-group">
-                            <label for="region">Região</label>
-                            <input type="text" class="form-control" name="region" id="region">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="key">Key</label>
-                            <input type="text" class="form-control" name="key" id="key">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="secret">Secret</label>
-                            <input type="text" class="form-control" name="secret" id="secret">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="expirationTime">Tempo de expiração</label>
-                            <input type="text" class="form-control" name="expirationTime" id="expirationTime">
-                        </div>
-                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <input type="hidden" name="bucket" value="{{ $bucket }}">
+                        <button type="submit" class="btn btn-primary">Upload</button>
                     </form>
                 </div>
             </div>
@@ -59,14 +45,14 @@
                 <div class="card-body">
 
                     <ul class="list-group">
-                        @foreach($buckets as $bucket)
+                        @foreach($files as $file)
                             <li class="list-group-item">
                                 <span>
-                                    <form action="{{ route('bucket.destroy', $bucket->id) }}" method="POST">
+                                    <form action="{{ route('bucket.destroy', 1) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn text-danger">X</button>
-                                        <a href="{{ route('bucket.edit', $bucket->id) }}">{{ $bucket->name }}</a>
+                                        <a href="{{ route('file.edit', 1) }}">{{ $file }}</a>
                                     </form>
                                 </span>
                             </li>
