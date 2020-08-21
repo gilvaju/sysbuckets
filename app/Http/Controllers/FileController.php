@@ -4,27 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Bucket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @param $id
+     * @param Bucket $bucket
      * @return void
      */
     public function index(Bucket $bucket)
     {
-        $arrayWithNewSettings = [
-            'name' => $bucket->name,
-            'region' => $bucket->region,
+        $bucketConfig = [
+            'driver' => 's3',
             'key' => $bucket->key,
-            'secret' => $bucket->secret
+            'secret' => $bucket->secret,
+            'region' => $bucket->region,
+            'bucket' => $bucket->name,
         ];
-        config(['filesystems.disks.s3' => $arrayWithNewSettings]);
+        config(['filesystems.disks.s3' => $bucketConfig]);
         $file = Storage::disk('s3')->url('cake.jpg');
-        return $file;
-//        dd(config());
+        dd($file);
     }
 
     /**
