@@ -85,8 +85,8 @@
                 </div>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Buckets</a>
-                    <a href="https://laracasts.com">Arquivos</a>
+                    <a href="{{ url('/bucket') }}">Buckets</a>
+                    <a href="{{ url('/file') }}">Arquivos</a>
                 </div>
             </div>
         </div>
