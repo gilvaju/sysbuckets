@@ -23,17 +23,12 @@
 
                     <form action="{{ route('file.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
-                        <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <span class="input-group-text">Arquivo:</span>
-                            </div>
-                            <div class="custom-file">
-                                <input type="file" name="file" class="custom-file-input" id="files">
-                                <label class="custom-file-label" for="files">Procurar</label>
-                            </div>
+                        <div class="form-group">
+                            <label for="files">Selecione seu arquivo:</label>
+                            <input type="file" name="file" class="form-control-file" id="files">
                         </div>
                         <input type="hidden" name="bucket" value="{{ $bucket }}">
-                        <button type="submit" class="btn btn-primary">Upload</button>
+                        <button type="submit" class="btn btn-primary btn-sm">Upload</button>
                     </form>
                 </div>
             </div>
