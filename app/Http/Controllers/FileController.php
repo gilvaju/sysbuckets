@@ -16,16 +16,9 @@ class FileController extends Controller
      */
     public function index(Bucket $bucket)
     {
-        $bucketConfig = [
-            'driver' => 's3',
-            'key' => $bucket->key,
-            'secret' => $bucket->secret,
-            'region' => $bucket->region,
-            'bucket' => $bucket->name,
-        ];
-        config(['filesystems.disks.s3' => $bucketConfig]);
-        $file = Storage::disk('s3')->url('cake.jpg');
-        dd($file);
+        $this->setBucket($bucket);
+        $files = Storage::disk('s3')->files();
+        return view('file')->with('files', $files)->with('bucket', $bucket->id);
     }
 
     /**
@@ -46,7 +39,23 @@ class FileController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (!$request->file('file')) {
+            $request->session()->flash('status', 'Erro no upload');
+            return redirect('/file');
+        }
+
+        $this->setBucket(Bucket::find($request->bucket));
+        $path = $request->file('file')->store('images');
+
+        if (Storage::disk('s3')->put($request->file('file')->getClientOriginalName(), $path)) {
+            // $image = Image::create([
+            //     'filename' => basename($path),
+            //     'url' => Storage::disk('s3')->url($path)
+            // ]);
+            $request->session()->flash('status', 'Upload com sucesso');
+        }
+
+        return redirect('/file');
     }
 
     /**
@@ -68,7 +77,7 @@ class FileController extends Controller
      */
     public function edit($id)
     {
-        //
+        return 1;
     }
 
     /**
@@ -92,5 +101,20 @@ class FileController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * @param Bucket $bucket
+     */
+    private function setBucket(Bucket $bucket): void
+    {
+        $bucketConfig = [
+            'driver' => 's3',
+            'key' => $bucket->key,
+            'secret' => $bucket->secret,
+            'region' => $bucket->region,
+            'bucket' => $bucket->name,
+        ];
+        config(['filesystems.disks.s3' => $bucketConfig]);
     }
 }
