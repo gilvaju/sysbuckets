@@ -22,5 +22,8 @@ Route::get('/dashboard', 'HomeController@index')->name('dashboard');
 Route::resource('bucket', 'BucketController');
 
 Route::get('file/{bucket}', ['as' => 'file.index', 'uses' => 'FileController@index']);
-Route::get('file/{id}/{bucket}', ['as' => 'file.edit', 'uses' => 'FileController@edit']);
-Route::resource('file', 'FileController', ['except' => ['index', 'edit']]);
+Route::get('file/view/{id}/{bucket}', ['as' => 'file.show', 'uses' => 'FileController@show']);
+Route::resource('file', 'FileController', ['except' => ['index', 'show', 'edit', 'create']]);
+
+Route::get('/files/{filePath}', 'FileController@download')
+    ->where(['filePath' => '.*'])->name('storage.file');

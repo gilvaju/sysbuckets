@@ -25,6 +25,15 @@ class FileController extends Controller
         $this->middleware('auth');
     }
 
+    public function download($filepath) {
+
+        if (!Storage::disk('private')->exists($filepath)){
+            abort('404');
+        }
+
+        return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($filepath)));
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -34,6 +43,7 @@ class FileController extends Controller
     public function index(Bucket $bucket, Request $request)
     {
         $this->setBucket($bucket);
+
         try {
             $filesBucket = Storage::disk('s3')->files();
         } catch (\Exception $exception) {
@@ -41,28 +51,18 @@ class FileController extends Controller
             return redirect(route('bucket.index'));
         }
 
-        $files = [];
-        foreach ($filesBucket as $file) {
-            $files[] = [
-                'name' => $file,
-                'url' => $this->getTemporaryUrl($file)
-            ];
-        }
+//        $files = [];
+//        foreach ($filesBucket as $file) {
+//            $files[] = [
+//                'name' => $file,
+//                'url' => $this->getTemporaryUrl($file)
+//            ];
+//        }
 
         return view('file')
-            ->with('files', $files)
+            ->with('files', $filesBucket)
             ->with('bucket', $bucket->id)
             ->with('bucketName', $bucket->name);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
     }
 
     /**
@@ -92,32 +92,15 @@ class FileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($id, Bucket $bucket, Request $request)
     {
-        //
-    }
+        $this->setBucket(Bucket::find($bucket->id));
+        $this->dowloadFile($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
+        return view('file-show')
+            ->with('path', $id)
+            ->with('bucket', $bucket->id)
+            ->with('bucketName', $bucket->name);
     }
 
     /**
@@ -161,4 +144,17 @@ class FileController extends Controller
     {
         return Storage::disk('s3')->temporaryUrl($file, Carbon::now()->addMinutes($this->bucketExpirationTime));
     }
+
+    /**
+     * @param int $id
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    private function dowloadFile($id)
+    {
+        $s3_file = Storage::disk('s3')->get($id);
+        $s3 = Storage::disk('private');
+        $s3->put("./" . $id, $s3_file, 'private');
+    }
+
+
 }

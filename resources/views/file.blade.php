@@ -42,20 +42,21 @@
                         @foreach($files as $file)
                             <li class="list-group-item">
                                 <span>
-                                    <form action="{{ route('file.destroy', $file['name']) }}" method="POST">
+                                    <form action="{{ route('file.destroy', $file) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <input type="hidden" name="bucket" value="{{ $bucket }}">
                                         <button type="submit" class="btn text-danger">X</button>
-                                        <a href="{{ $file['url'] }}" target="_blank">{{ $file['name'] }}</a>
+                                        <a href="{{ route('file.show', ['id' => $file, 'bucket' => $bucket]) }}">{{ $file }}</a>
                                     </form>
                                 </span>
                             </li>
                         @endforeach
                     </ul>
                     <div class="row mt-3 ml-1">
-                        <a href="{{ route('bucket.index') }}" class="btn btn-dark" role="button">Voltar para lista de Buckets</a>
+                        <a href="{{ route('bucket.index') }}" class="btn btn-dark" role="button">Buckets</a>
                     </div>
+
                 </div>
             </div>
         </div>
