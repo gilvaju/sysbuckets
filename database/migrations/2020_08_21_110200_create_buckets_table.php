@@ -14,8 +14,13 @@ class CreateBucketsTable extends Migration
     public function up()
     {
         Schema::create('buckets', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->timestamps();
+            $table->text('name');
+            $table->text('region');
+            $table->text('key');
+            $table->text('secret');
+            $table->text('expirationTime');
         });
     }
 
