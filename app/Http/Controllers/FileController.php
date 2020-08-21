@@ -66,7 +66,7 @@ class FileController extends Controller
     public function store(Request $request)
     {
         if (!$request->file('file')) {
-            $request->session()->flash('status', 'Arquivo inexistente');
+            $request->session()->flash('error', 'Arquivo inexistente');
             return redirect(route('file.index', $request->bucket));
         }
 
