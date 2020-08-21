@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bucket;
 use Illuminate\Http\Request;
 
 class BucketController extends Controller
@@ -13,7 +14,7 @@ class BucketController extends Controller
      */
     public function index()
     {
-        //
+        return view('buckets');
     }
 
     /**
@@ -32,9 +33,19 @@ class BucketController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Bucket $bucket)
     {
-        //
+        request()->validate([
+            'name' => ['required'],
+            'region' => ['required'],
+            'key' => ['required'],
+            'secret' => ['required'],
+            'expirationTime' => ['required']
+        ]);
+
+        $bucket->create($request->all());
+        $request->session()->flash('status', 'Bucket salvo!');
+        return redirect('/bucket');
     }
 
     /**
