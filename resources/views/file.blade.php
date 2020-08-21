@@ -43,11 +43,12 @@
                         @foreach($files as $file)
                             <li class="list-group-item">
                                 <span>
-                                    <form action="{{ route('bucket.destroy', 1) }}" method="POST">
+                                    <form action="{{ route('file.destroy', $file['name']) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
+                                        <input type="hidden" name="bucket" value="{{ $bucket }}">
                                         <button type="submit" class="btn text-danger">X</button>
-                                        <a href="{{ route('file.edit', 1) }}">{{ $file }}</a>
+                                        <a href="{{ $file['url'] }}" target="_blank">{{ $file['name'] }}</a>
                                     </form>
                                 </span>
                             </li>
