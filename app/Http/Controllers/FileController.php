@@ -4,11 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Bucket;
 use App\File;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class FileController extends Controller
 {
+    /**
+     * @var mixed
+     */
+    private $bucketExpirationtime;
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +24,16 @@ class FileController extends Controller
     public function index(Bucket $bucket)
     {
         $this->setBucket($bucket);
-        $files = Storage::disk('s3')->files();
+        $filesBucket = Storage::disk('s3')->files();
+
+        $files = [];
+        foreach ($filesBucket as $file) {
+            $files[] = [
+                'name' => $file,
+                'url' => $this->getTemporaryUrl($file)
+            ];
+        }
+
         return view('file')->with('files', $files)->with('bucket', $bucket->id);
     }
 
@@ -47,11 +62,7 @@ class FileController extends Controller
 
         $this->setBucket(Bucket::find($request->bucket));
 
-        if (Storage::disk('s3')->put($request->file('file')->getClientOriginalName(),'/')) {
-             $file = File::create([
-                 'filename' => $request->file('file')->getClientOriginalName(),
-                 'url' => Storage::disk('s3')->url($request->file('file')->getClientOriginalName())
-             ]);
+        if ($request->file('file')->storeAs('/', $request->file('file')->getClientOriginalName())) {
             $request->session()->flash('status', 'Upload com sucesso');
         }
         return redirect(route('file.index', $request->bucket));
@@ -76,7 +87,10 @@ class FileController extends Controller
      */
     public function edit($id)
     {
-        return 1;
+        //
+//        $this->setBucket(Bucket::find($bucket));
+//        $fileUrl = Storage::disk('s3')->temporaryUrl($id, Carbon::now()->addMinutes($this->bucketExpirationtime));;
+//        return view('file-show')->with('fileUrl', $fileUrl);
     }
 
     /**
@@ -97,9 +111,15 @@ class FileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
-        //
+        $this->setBucket(Bucket::find($request->bucket));
+
+        if(Storage::disk('s3')->exists($id)) {
+            Storage::disk('s3')->delete($id);
+            $request->session()->flash('status', 'Arquivo excluído!');
+        }
+        return redirect(route('file.index', $request->bucket));
     }
 
     /**
@@ -107,6 +127,7 @@ class FileController extends Controller
      */
     private function setBucket(Bucket $bucket): void
     {
+        $this->bucketExpirationtime = $bucket->expirationTime;
         $bucketConfig = [
             'driver' => 's3',
             'key' => $bucket->key,
@@ -115,5 +136,14 @@ class FileController extends Controller
             'bucket' => $bucket->name,
         ];
         config(['filesystems.disks.s3' => $bucketConfig]);
+    }
+
+    /**
+     * @param $file
+     * @return mixed
+     */
+    private function getTemporaryUrl($file)
+    {
+        return Storage::disk('s3')->temporaryUrl($file, Carbon::now()->addMinutes($this->bucketExpirationtime));
     }
 }

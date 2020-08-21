@@ -22,4 +22,5 @@ Route::get('/dashboard', 'HomeController@index')->name('dashboard');
 Route::resource('bucket', 'BucketController');
 
 Route::get('file/{bucket}', ['as' => 'file.index', 'uses' => 'FileController@index']);
-Route::resource('file', 'FileController', ['except' => ['index']]);
+Route::get('file/{id}/{bucket}', ['as' => 'file.edit', 'uses' => 'FileController@edit']);
+Route::resource('file', 'FileController', ['except' => ['index', 'edit']]);
