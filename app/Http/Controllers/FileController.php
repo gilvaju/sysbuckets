@@ -31,10 +31,15 @@ class FileController extends Controller
      * @param Bucket $bucket
      * @return void
      */
-    public function index(Bucket $bucket)
+    public function index(Bucket $bucket, Request $request)
     {
         $this->setBucket($bucket);
-        $filesBucket = Storage::disk('s3')->files();
+        try {
+            $filesBucket = Storage::disk('s3')->files();
+        } catch (\Exception $exception) {
+            $request->session()->flash('error', 'Dados do bucket inválidos');
+            return redirect(route('bucket.index'));
+        }
 
         $files = [];
         foreach ($filesBucket as $file) {
