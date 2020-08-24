@@ -59,7 +59,7 @@
                     <ul class="list-group">
                         @foreach($buckets as $bucket)
                             <li class="list-group-item">
-                                <button type="button" class="btn text-danger btn-sm" data-toggle="modal" data-target="#deleteModal">X</button>
+                                <button type="button" class="btn text-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{$bucket->id}}">X</button>
                                 <a href="{{ route('bucket.edit', $bucket->id) }}" class="ml-2">{{ $bucket->name }}</a>
                                 <a href="{{ route('file.index', $bucket->id) }}" class="no-decoration ml-2">
                                     <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -68,11 +68,11 @@
                                     </svg>
                                 </a>
                                 <!-- Modal -->
-                                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <div class="modal fade" id="deleteModal{{$bucket->id}}" tabindex="-1" role="dialog" aria-labelledby="deleteModal{{$bucket->id}}Label" aria-hidden="true">
                                     <div class="modal-dialog" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel">Apagar dados do Bucket</h5>
+                                                <h5 class="modal-title" id="deleteModal{{$bucket->id}}Label">Apagar dados do Bucket</h5>
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
                                             </div>
                                             <div class="modal-body"> Você quer mesmo apagar? </div>
@@ -89,7 +89,7 @@
                                 </div>
                                 <script>
                                     $( document ).on( "click", "#delete", function() {
-                                        $('#deleteModal').modal('hide');
+                                        $('#deleteModal{{$bucket->id}}').modal('hide');
                                     });
                                 </script>
                             </li>
