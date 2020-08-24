@@ -4,8 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Bucket;
 use Carbon\Carbon;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 
@@ -33,13 +34,13 @@ class FileController extends Controller
         }
 
         return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($filepath)));
-//        return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($filepath)));
     }
 
     /**
      * Display a listing of the resource.
      *
      * @param Bucket $bucket
+     * @param Request $request
      * @return void
      */
     public function index(Bucket $bucket, Request $request)
@@ -53,16 +54,8 @@ class FileController extends Controller
             return redirect(route('bucket.index'));
         }
 
-        $files = [];
-        foreach ($filesBucket as $file) {
-            $files[] = [
-                'name' => $file,
-                'url' => URL::temporarySignedRoute('file.show', now()->addMinutes($this->bucketExpirationTime), ['id' => $file, 'bucket' => $bucket->id])
-            ];
-        }
-
         return view('file')
-            ->with('files', $files)
+            ->with('files', $this->filesForArray($filesBucket, $bucket))
             ->with('bucket', $bucket->id)
             ->with('bucketName', $bucket->name);
     }
@@ -70,8 +63,8 @@ class FileController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -94,27 +87,21 @@ class FileController extends Controller
      * @param int $id
      * @param Bucket $bucket
      * @param Request $request
-     * @return \Illuminate\Http\Response
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @return Response
+     * @throws FileNotFoundException
      */
     public function show($id, Bucket $bucket, Request $request)
     {
-        $this->setBucket(Bucket::find($bucket->id));
-        $this->dowloadFile($id);
-
+        $this->dowloadFile($id, $bucket->id);
         return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($id)));
-
-//        return view('file-show')
-//            ->with('path', $id)
-//            ->with('bucket', $bucket->id)
-//            ->with('bucketName', $bucket->name);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
     public function destroy(Request $request, $id)
     {
@@ -154,13 +141,33 @@ class FileController extends Controller
 
     /**
      * @param int $id
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @param $bucketId
+     * @throws FileNotFoundException
      */
-    private function dowloadFile($id)
+    private function dowloadFile($id, $bucketId)
     {
+        $this->setBucket(Bucket::find($bucketId));
+
         $s3_file = Storage::disk('s3')->get($id);
         $s3 = Storage::disk('private');
         $s3->put("./" . $id, $s3_file, 'private');
+    }
+
+    /**
+     * @param array $filesBucket
+     * @param Bucket $bucket
+     * @return array
+     */
+    private function filesForArray(array $filesBucket, Bucket $bucket): array
+    {
+        $files = [];
+        foreach ($filesBucket as $file) {
+            $files[] = [
+                'name' => $file,
+                'url' => URL::temporarySignedRoute('file.show', now()->addMinutes($this->bucketExpirationTime), ['id' => $file, 'bucket' => $bucket->id])
+            ];
+        }
+        return $files;
     }
 
 

@@ -24,6 +24,3 @@ Route::resource('bucket', 'BucketController');
 Route::get('file/{bucket}', ['as' => 'file.index', 'uses' => 'FileController@index']);
 Route::get('file/view/{id}/{bucket}', ['as' => 'file.show', 'uses' => 'FileController@show'])->middleware('signed');
 Route::resource('file', 'FileController', ['except' => ['index', 'show', 'edit', 'create']]);
-
-Route::get('/files/{filePath}', 'FileController@download')
-    ->where(['filePath' => '.*'])->name('storage.file')->middleware('signed');
