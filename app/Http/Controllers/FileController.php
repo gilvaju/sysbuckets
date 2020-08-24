@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Bucket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class FileController extends Controller
 {
-
     /**
      * @var mixed
      */
@@ -32,6 +33,7 @@ class FileController extends Controller
         }
 
         return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($filepath)));
+//        return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($filepath)));
     }
 
     /**
@@ -51,16 +53,16 @@ class FileController extends Controller
             return redirect(route('bucket.index'));
         }
 
-//        $files = [];
-//        foreach ($filesBucket as $file) {
-//            $files[] = [
-//                'name' => $file,
-//                'url' => $this->getTemporaryUrl($file)
-//            ];
-//        }
+        $files = [];
+        foreach ($filesBucket as $file) {
+            $files[] = [
+                'name' => $file,
+                'url' => URL::temporarySignedRoute('file.show', now()->addMinutes($this->bucketExpirationTime), ['id' => $file, 'bucket' => $bucket->id])
+            ];
+        }
 
         return view('file')
-            ->with('files', $filesBucket)
+            ->with('files', $files)
             ->with('bucket', $bucket->id)
             ->with('bucketName', $bucket->name);
     }
@@ -89,18 +91,23 @@ class FileController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
+     * @param Bucket $bucket
+     * @param Request $request
      * @return \Illuminate\Http\Response
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function show($id, Bucket $bucket, Request $request)
     {
         $this->setBucket(Bucket::find($bucket->id));
         $this->dowloadFile($id);
 
-        return view('file-show')
-            ->with('path', $id)
-            ->with('bucket', $bucket->id)
-            ->with('bucketName', $bucket->name);
+        return response()->file(storage_path('app/files'.DIRECTORY_SEPARATOR.($id)));
+
+//        return view('file-show')
+//            ->with('path', $id)
+//            ->with('bucket', $bucket->id)
+//            ->with('bucketName', $bucket->name);
     }
 
     /**
