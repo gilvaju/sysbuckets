@@ -39,17 +39,38 @@
 
                 <div class="card-body">
                     <ul class="list-group">
-                        @foreach($files as $file)
+                        @foreach($files as $key => $file)
                             <li class="list-group-item">
-                                <span>
-                                    <form action="{{ route('file.destroy', $file['name']) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <input type="hidden" name="bucket" value="{{ $bucket }}">
-                                        <button type="submit" class="btn text-danger">X</button>
-                                        <a href="{{ url($file['url']) }}">{{ $file['name'] }}</a>
-                                    </form>
-                                </span>
+                                <button type="button" class="btn text-danger btn-sm" data-toggle="modal" data-target="#deleteModal{{$key}}">X</button>
+                                <a href="{{ url($file['url']) }}" class="ml-2">{{ $file['name'] }}</a>
+                                <!-- Modal -->
+                                <div class="modal fade" id="deleteModal{{$key}}" tabindex="-1" role="dialog" aria-labelledby="deleteModal{{$key}}Label" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModal{{$key}}Label">Apagar arquivo</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+                                            </div>
+                                            <div class="modal-body"> Você quer mesmo apagar? </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+                                                <form action="{{ route('file.destroy', $file['name']) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <input type="hidden" name="bucket" value="{{ $bucket }}">
+                                                    <button type="submit" class="btn btn-danger">Sim</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <script>
+                                    $( document ).on( "click", "#delete", function() {
+                                        $('#deleteModal{{$key}}').modal('hide');
+                                    });
+                                </script>
+
+
                             </li>
                         @endforeach
                     </ul>

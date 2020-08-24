@@ -44,7 +44,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="expirationTime">Tempo de expiração</label>
+                            <label for="expirationTime">Tempo de expiração (Minutos)</label>
                             <input type="text" class="form-control" name="expirationTime" id="expirationTime">
                         </div>
                         <button type="submit" class="btn btn-primary">Salvar</button>
@@ -55,26 +55,43 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-header">{{ __('Lista de buckets') }}</div>
-
                 <div class="card-body">
-
                     <ul class="list-group">
                         @foreach($buckets as $bucket)
                             <li class="list-group-item">
-                                <span>
-                                    <form action="{{ route('bucket.destroy', $bucket->id) }}" method="POST">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn text-danger">X</button>
-                                        <a href="{{ route('bucket.edit', $bucket->id) }}">{{ $bucket->name }}</a>
-                                        <a href="{{ route('file.index', $bucket->id) }}" class="no-decoration ml-2">
-                                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                              <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
-                                              <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
-                                            </svg>
-                                        </a>
-                                    </form>
-                                </span>
+                                <button type="button" class="btn text-danger btn-sm" data-toggle="modal" data-target="#deleteModal">X</button>
+                                <a href="{{ route('bucket.edit', $bucket->id) }}" class="ml-2">{{ $bucket->name }}</a>
+                                <a href="{{ route('file.index', $bucket->id) }}" class="no-decoration ml-2">
+                                    <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                                        <path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                                    </svg>
+                                </a>
+                                <!-- Modal -->
+                                <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="deleteModalLabel">Apagar dados do Bucket</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span aria-hidden="true">&times;</span> </button>
+                                            </div>
+                                            <div class="modal-body"> Você quer mesmo apagar? </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Não</button>
+                                                <form action="{{ route('bucket.destroy', $bucket->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger">Sim</button>
+                                                </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
+                                <script>
+                                    $( document ).on( "click", "#delete", function() {
+                                        $('#deleteModal').modal('hide');
+                                    });
+                                </script>
                             </li>
                         @endforeach
                     </ul>
